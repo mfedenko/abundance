@@ -12,6 +12,13 @@ contract ERC20Interface {
     event Transfer(address indexed from, address indexed to, uint256 amount);
     event Approval(address indexed owner, address indexed spender, uint256 amount);
 } 
+ /*STILL NEED: Method for allocating ether to Funds.
+    RunOff voting system for allocation
+    Voter verification specific to Vassar 
+    Voter period throughout week donating period throughout the week 
+    (possible event) every week 1hr period //Closed voting period for funds to be reallocated by the contract 50 percent equal 50 by vote runoff 
+    Storing past votes from previous voting periods 
+*/ 
 
 contract EmerFund {
     //Model a Fund
@@ -20,12 +27,18 @@ contract EmerFund {
         string name;
         unit voteCount;
     }  
-
+    //Store accounts that have voted bool= true means they voted 
+    mapping(address => bool) public voters;
     //Store Funds
     //Fetch Fund from storage using mapping (key, value)
     mapping(unit => Fund) public funds;
     //Store Fund Count in storage (keep track of how many there are)
     unit public fundsCount; 
+
+    // voted event 
+    event votedEvent( 
+        unit indexed _fundId
+    );
 
     function EmerFund () public {
         addFund("Physical Health");
@@ -42,11 +55,29 @@ contract EmerFund {
         fundsCount ++;
         funds[fundsCount] = Fund(fundsCount, _name, 0);
     }
-    //Vote function
-    function Vote (unit _fundId) public {
-    //Voter voted?
-    //Update Fund vote 
-    fund[_fundId].voteCount ++;
+   
+    //vote function
+    function vote (unit _fundId) public {
+    /*require that they havent voted before (in specific timeframe??)
+    msg sender not in mapping
+    */
+    require(!voters[msg.sender]);
+    
+    /*require a valid fund (the fund id is greater than 0 and less than the total amount of funds) 
+    returns true >> continues executing  vote function 
+    */
+    require (_fundId > 0 && _fundId <= fundsCount)
+    
+    //record voters that have already voted 
+    voters[msg.sender] = true 
+
+
+    //Update Fund votecount by 1 
+    funds[_fundId].voteCount ++;
+
+    // trigger voted event 
+    votedEvent(_fundId);
     }
- 
+
+    //Voter Verification (vassar.edu??)
 }
