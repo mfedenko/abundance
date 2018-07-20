@@ -12,12 +12,12 @@ contract ERC20Interface {
     event Transfer(address indexed from, address indexed to, uint256 amount);
     event Approval(address indexed owner, address indexed spender, uint256 amount);
 } 
- /*STILL NEED: Method for allocating ether to Funds.
-    RunOff voting system for allocation
-    Voter verification specific to Vassar 
-    Voter period throughout week donating period throughout the week 
-    (possible event) every week 1hr period //Closed voting period for funds to be reallocated by the contract 50 percent equal 50 by vote runoff 
-    Storing past votes from previous voting periods 
+ /*STILL NEED: 
+Proportional allocation FUNC 
+EVENT (use blocktime)// //Close Vote, calculate votes, show results, reset everything to 0 
+Verify unit or uint!! go through code 
+Voter verification specific to Vassar (in presentation)
+Storing past votes from previous voting periods PYTHON TERM 
 */ 
 
 contract EmerFund {
@@ -29,17 +29,49 @@ contract EmerFund {
     }  
     //Store accounts that have voted bool= true means they voted 
     mapping(address => bool) public voters;
-    //Store Funds
+
     //Fetch Fund from storage using mapping (key, value)
-    mapping(unit => Fund) public funds;
+    mapping(uint => Fund) public funds;
+
     //Store Fund Count in storage (keep track of how many there are)
     unit public fundsCount; 
+
+    // monies variable 
+    Var monies (uint)
+
+    //Store monies (display total val??) 
+    function TotMonies(unit amount) payable {
+        monies += amount
+    }
+
+    //Allocating 50 percent Equally
+        function equiAll {
+    //half monies divided by fundsCount
+        halfmoniesDFC = uint((monies / 2) / fundsCount) 
+    //do equal allocation to funds 
+        for (uint i=0; i<fundsCount; i++) 
+        {funds[i] += halfmoniesDFC}
+    }
+
+    //proportional allocation
+        event proAll {
+        halfmonies = uint ((monies / 2)
+    //do pro allocation to funds 
+        for (uint i=0; i<fundsCount; i++) 
+        {funds[i] += }
+    }
 
     // voted event 
     event votedEvent( 
         unit indexed _fundId
     );
+    
+    //Close Vote, calculate votes, provides that info and resets
 
+    //Variable (chairperson) 
+    var address Admin 
+
+    //Constructor 
     function EmerFund () public {
         addFund("Physical Health");
         addFund("Mental Health");
@@ -48,14 +80,27 @@ contract EmerFund {
         addFund("Home Support");
         addFund("Travel");
         addFund("Food");
-        addFund("Childcare");
+        addFund("Childcare"); 
+        Admin = msg.sender 
     }
-    function addFund (string _name) private {
+
+    //Add Fund
+    function addFund (string _name) public {
+        require (msg.sender == Admin)
         //increment the num of fund categories 
         fundsCount ++;
         funds[fundsCount] = Fund(fundsCount, _name, 0);
     }
-   
+
+    //Remove Fund
+    function remFund (string _name) public {
+        require (msg.sender == Admin)
+        require (_fundId > 0 && _fundId <= fundsCount)
+        //decrement the num of fund categories 
+        fundsCount --;
+        funds[fundsCount] = Fund(fundsCount, _name, 0); //clarify w corin 
+    }
+
     //vote function
     function vote (unit _fundId) public {
     /*require that they havent voted before (in specific timeframe??)
