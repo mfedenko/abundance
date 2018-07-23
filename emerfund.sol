@@ -15,7 +15,6 @@ contract ERC20Interface {
  /*STILL NEED: 
 Proportional allocation FUNC 
 EVENT (use blocktime)// //Close Vote, calculate votes, show results, reset everything to 0 
-Voting func: allow voters to input top 1/2/3 ranking 
 Voter verification specific to Vassar (in presentation)
 Storing past votes from previous voting periods PYTHON TERM 
 */ 
@@ -38,7 +37,7 @@ contract EmerFund {
      uint public fundsCount; 
 
     // monies variable 
-    Var monies (uint)
+    uint monies 
 
     //Store monies (display total val??) 
     function TotMonies(uint amount) payable {
@@ -46,7 +45,7 @@ contract EmerFund {
     }
 
     //Allocating 50 percent Equally
-        function equiAll {
+    function equiAll {
     //half monies divided by fundsCount
         halfmoniesDFC = uint((monies / 2) / fundsCount) 
     //do equal allocation to funds 
@@ -54,12 +53,22 @@ contract EmerFund {
         {funds[i] += halfmoniesDFC}
     }
 
-    //proportional allocation
-        event proAll {
+    //total votes variable
+    uint TotVote 
+
+    //final allocation of other 50 percent 
+    function FinalAll {
         halfmonies = uint(monies / 2)
-    //do pro allocation to funds 
-        for (uint i=0; i<fundsCount; i++) 
-        {funds[i] += }
+    //get total votes
+        for (uint i=0; i<fundsCount; i++)
+        funds[i].voteCount + TotVote;
+    //get proportion of each fund's votes amongst TotVote 
+        for (uint i=0; i<fundsCount; i++)
+        proVote = funds[i].voteCount // TotVote
+    //allocate monies proportionally to funds (proportion x total monies)
+        for (uint i=0; i<fundsCount; i++)
+        proMonies = (proVote x halfmonies) 
+        proMonies + funds[i]
     }
 
     // voted event 
@@ -67,10 +76,19 @@ contract EmerFund {
         uint  indexed _fundId
     );
     
-    //Close Vote, calculate votes, provides results, and reset
-    event closeVote(
-        returns 
+    //Close Vote: shows total votes, votes for each fund 
+    // how much monies each fund recieved, calls reset func 
+    event closeVote (
+        reset
     )
+
+    //resets monie storage, total votes, votes for ind funds
+    function reset {
+    monies = 0
+    TotVote = 0
+    for (uint i=0; i<fundsCount; i++)
+        funds[i].voteCount = 0 
+
 
     //Variable (chairperson) 
     var address Admin 
@@ -96,7 +114,7 @@ contract EmerFund {
         funds[fundsCount] = Fund(fundsCount, _name, 0);
     }
 
-    //Remove Fund
+    //Remove Fundblockchain timestamp
     function remFund (string _name) public {
         require (msg.sender == Admin)
         require (_fundId > 0 && _fundId <= fundsCount)
@@ -107,10 +125,11 @@ contract EmerFund {
 
     //vote function
     function vote (uint  _fundId) public {
-    /*require that they havent voted before (in specific timeframe??)
-    msg sender not in mapping
-    */
-    require(!voters[msg.sender]);
+    if TotVote = 0;
+        action_time = now
+
+    //require that they havent voted before (in a week), so msg sender is not in mapping//
+    require(!voters[msg.sender] && now = (action_time + 1 week)) 
     
     /*require a valid fund (the fund id is greater than 0 and less than the total amount of funds) 
     returns true >> continues executing  vote function 
@@ -120,13 +139,16 @@ contract EmerFund {
     //record voters that have already voted 
     voters[msg.sender] = true 
 
-
     //Update Fund votecount by 1 
     funds[_fundId].voteCount ++;
 
     // trigger voted event 
     votedEvent(_fundId);
-    }
+   
+   //trigger close vote event
+   closeVote }
 
-    //Voter Verification (vassar.edu??)
+
+
+   
 }
