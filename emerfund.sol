@@ -15,7 +15,7 @@ contract ERC20Interface {
  /*STILL NEED: 
 Proportional allocation FUNC 
 EVENT (use blocktime)// //Close Vote, calculate votes, show results, reset everything to 0 
-Verify unit or uint!! go through code 
+Voting func: allow voters to input top 1/2/3 ranking 
 Voter verification specific to Vassar (in presentation)
 Storing past votes from previous voting periods PYTHON TERM 
 */ 
@@ -23,10 +23,11 @@ Storing past votes from previous voting periods PYTHON TERM
 contract EmerFund {
     //Model a Fund
     struct Fund{
-        unit id;
+        uint id;
         string name;
-        unit voteCount;
+        uint voteCount;
     }  
+
     //Store accounts that have voted bool= true means they voted 
     mapping(address => bool) public voters;
 
@@ -34,13 +35,13 @@ contract EmerFund {
     mapping(uint => Fund) public funds;
 
     //Store Fund Count in storage (keep track of how many there are)
-    unit public fundsCount; 
+     uint public fundsCount; 
 
     // monies variable 
     Var monies (uint)
 
     //Store monies (display total val??) 
-    function TotMonies(unit amount) payable {
+    function TotMonies(uint amount) payable {
         monies += amount
     }
 
@@ -55,7 +56,7 @@ contract EmerFund {
 
     //proportional allocation
         event proAll {
-        halfmonies = uint ((monies / 2)
+        halfmonies = uint(monies / 2)
     //do pro allocation to funds 
         for (uint i=0; i<fundsCount; i++) 
         {funds[i] += }
@@ -63,10 +64,13 @@ contract EmerFund {
 
     // voted event 
     event votedEvent( 
-        unit indexed _fundId
+        uint  indexed _fundId
     );
     
-    //Close Vote, calculate votes, provides that info and resets
+    //Close Vote, calculate votes, provides results, and reset
+    event closeVote(
+        returns 
+    )
 
     //Variable (chairperson) 
     var address Admin 
@@ -102,7 +106,7 @@ contract EmerFund {
     }
 
     //vote function
-    function vote (unit _fundId) public {
+    function vote (uint  _fundId) public {
     /*require that they havent voted before (in specific timeframe??)
     msg sender not in mapping
     */
