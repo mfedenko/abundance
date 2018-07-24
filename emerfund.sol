@@ -1,4 +1,3 @@
-
 pragma solidity ^0.4.4;
 
  /*STILL NEED: 
@@ -7,11 +6,9 @@ EVENT //Close Vote,  show results,
 Voter verification specific to Vassar (in presentation)
 Storing past votes from previous voting periods PYTHON TERM 
 */ 
-
 contract EmerFund {
     //Model a Fund
     struct Fund{
-        uint id;
         string name;
         uint voteCount;
         uint monies;
@@ -23,7 +20,7 @@ contract EmerFund {
     mapping(address => bool) public voters;
 
     //Fetch Fund from storage using mapping (key, value)
-    mapping(uint => Fund) public funds;
+    Fund[] public funds;
 
     //Store Fund Count in storage (keep track of how many there are)
      uint public fundsCount; 
@@ -32,7 +29,7 @@ contract EmerFund {
     uint monies;
 
     //Store monies (display total val??) 
-    function TotMonies(uint amount) payable {
+    function Donate(uint amount) public payable {
         monies += amount;
     }
     
@@ -40,6 +37,7 @@ contract EmerFund {
     //Allocating 50 percent Equally
     function equiAll () private {
     //half monies divided by fundsCount
+        uint halfmoniesDFC;
         halfmoniesDFC = uint((monies / 2) / fundsCount);
     //do equal allocation to funds 
         for (uint i=0; i<fundsCount; i++){
@@ -53,12 +51,12 @@ contract EmerFund {
     //final allocation of other 50 percent 
     function FinalAll () public {
         require (msg.sender == Admin);
-        halfmonies = uint(monies / 2);
+        uint halfmonies = uint(monies / 2);
     //get proportion of each fund's votes amongst TotVote 
         for (uint i=0; i<fundsCount; i++) {
-        proVote = (funds[i].voteCount / TotVote);
+        uint proVote = (funds[i].voteCount / TotVote);
     //allocate monies proportionally to funds (proportion x total monies)
-        proMonies = (proVote * halfmonies); 
+        uint proMonies = (proVote * halfmonies); 
         funds[i].monies +=  proMonies;
         }
         reset; 
@@ -69,15 +67,25 @@ contract EmerFund {
         uint  indexed _fundId
     );
     
-    //Close Vote: shows total votes, votes for each fund 
-    // how much monies each fund recieved, 
-    // event closeVote (
-        // emit TotVote
-       // for (uint i=0; i<fundsCount; i++)
-        //emit funds[i].voteCount 
-        //emit //monies in fund 
-        //reset //NEED CORIN HLP 
-   // );
+    
+    function votingInfo () public{
+    uint [] storage FundVotes;
+    uint [] storage FundMonies; 
+       for (uint i=0; i<fundsCount; i++){ 
+            FundVotes.push(funds[i].voteCount);
+            FundMonies.push(funds[i].monies);
+       }
+           emit closeVote(TotVote,FundVotes,FundMonies); 
+    }
+        
+    
+    
+    //Close Vote: shows total votes, votes for each fund,  how much monies each fund recieved
+    event closeVote(
+    uint TV, // Total Votes 
+    uint[] FundVotes,
+    uint[] FundMonies
+        );
 
     //resets monie storage, total votes, votes for ind funds
     function reset () private {
@@ -86,8 +94,8 @@ contract EmerFund {
     for (uint i=0; i<votersList.length; i++){
         voters[votersList[i]] = false;
     }
-    for (uint i=0; i<fundsCount; i++){
-        funds[i].voteCount = 0 ;
+    for (uint n=0; n<fundsCount; n++){
+        funds[n].voteCount = 0 ;
     }
     }
 
@@ -95,11 +103,19 @@ contract EmerFund {
     //Variable (chairperson) 
     address Admin;
     
-    //Transfer Monies to Admin <-----
-    
+        // into three phases:
+        // 1. checking conditions
+        // 2. performing actions (potentially changing conditions)
+        // 3. interacting with other contracts
+        
+    //Get Monies to Admin function <-----
+    function getMonies () public {
+    require (msg.sender == Admin);
+    Admin.transfer(monies);
+    }
 
     //Constructor 
-    constructor EmerFund () public {
+    constructor () public {
         addFund("Physical Health");
         addFund("Mental Health");
         addFund("Financial Aid");
@@ -116,16 +132,21 @@ contract EmerFund {
         require (msg.sender == Admin);
         //increment the num of fund categories 
         fundsCount ++;
-        funds[fundsCount] = Fund(fundsCount, _name, 0);
+        funds.push(Fund( _name, 0, 0));
     }
 
     //Remove Fund
     function remFund (string _name) public {
         require (msg.sender == Admin);
-        require (_fundId > 0 && _fundId <= fundsCount);
-        //decrement the num of fund categories 
-        fundsCount --;
-        funds[fundsCount] = Fund(fundsCount, _name, 0); //clarify w corin 
+        for (uint i=0; i<funds.length; i++){
+            if (keccak256(abi.encodePacked(funds[i].name))== keccak256(abi.encodePacked (_name))) {
+                delete funds[i];
+                //decrement the num of fund categories 
+                fundsCount --;
+                break ;
+            }
+        }
+
     }
 
     //vote function
@@ -149,7 +170,7 @@ contract EmerFund {
     TotVote ++;
 
     // trigger voted event 
-    votedEvent(_fundId);
+    emit votedEvent(_fundId);
    
    //trigger close vote event
    //closeVote }
