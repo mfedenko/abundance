@@ -15,7 +15,7 @@ contract EmerFund {
     uint TotVote;
     
     //Variable (chairperson) 
-    address Admin;
+    address public Admin;
     
     //list of voters 
     address[] public votersList; 
@@ -33,8 +33,8 @@ contract EmerFund {
     uint monies;
 
     //Store monies (display total val??) 
-    function Donate(uint amount) public payable {
-        monies += amount;
+    function Donate() public payable {
+        monies += msg.value;
     }
     
     //Allocating 50 percent Equally
@@ -58,6 +58,7 @@ contract EmerFund {
     //final allocation of other 50 percent 
     function FinalAll () public {
         require (msg.sender == Admin);
+        equiAll();
         uint halfmonies = uint(monies / 2);
         
     //get proportion of each fund's votes amongst TotVote 
